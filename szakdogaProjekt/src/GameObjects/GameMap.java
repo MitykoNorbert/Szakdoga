@@ -73,6 +73,7 @@ public class GameMap {
         testhouse.shallProvide("Energy", 3);
         //if provides amount, it should need an interaction for example: "Regaining energy" process,/ if its 0, it should mean there is something in its storage that provides said thing
         objects.add(testhouse);
+        importStructures();
 
     }
     public ArrayList<Structure> getStructures(){
@@ -158,10 +159,53 @@ public class GameMap {
         }
         System.out.println("chars imported");
     }
-
     public void importStructures() {
+        //TODO
+        System.out.println("Structures importing..");
+        try {
+            File needslistFile = new File("Structures.txt");
+            Scanner myReader = new Scanner(needslistFile);
+            while (myReader.hasNextLine()) {
+                String line = myReader.nextLine();
+                String[] strucStats = line.split(",");
+                int row = Integer.parseInt(strucStats[0]);
+                int col = Integer.parseInt(strucStats[1]);
+                int width = Integer.parseInt(strucStats[2]);
+                int height = Integer.parseInt(strucStats[3]);
+                int storageCapacity = Integer.parseInt(strucStats[4]);
+                boolean isHome = false;
+                if(strucStats[5].equals("home") || strucStats[5].equals("true")){
+                    isHome = true;
+                }
+                byte interactCapacity = Byte.parseByte(strucStats[6]);
+                line = myReader.nextLine();
+                strucStats = line.split(",");
+                Structure inputStruc = new Structure(row, col, width, height, storageCapacity, isHome, interactCapacity,this);
+                for (int i = 0; i < strucStats.length; i++) {
+                    if (availableNeeds.containsKey(strucStats[i])) {
+                        NeedValue personalNeed = new NeedValue(availableNeeds.get(strucStats[i]));
+                        inputStruc.getNeeds().put(strucStats[i], personalNeed);
+                    }
+                }
+                line = myReader.nextLine();
+                strucStats = line.split(",");
+                for (int i = 0; i < strucStats.length; i++) {
+                    if (availableNeeds.containsKey(strucStats[i])) {
+                        String provision = strucStats[i];
+                        inputStruc.getProvides().put(provision,1);
+                    }
+                }
+                objects.add(inputStruc);
 
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred while reading Structures.txt.");
+            e.printStackTrace();
+        }
+        System.out.println("chars imported");
     }
+
 
     public int getRowSize() {
         return rowSize;

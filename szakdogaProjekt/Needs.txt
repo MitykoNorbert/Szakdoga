@@ -4,3 +4,5 @@ Hunger,150,300,2,Health,1
 Thirst,300,300,3,Health,1
 Sleep,400,500,5,Energy,3
 Music,500,600,2,Energy,1
+Condition,2000,2000,0,unknown,0
+Clean,50,400,1,Condition,1

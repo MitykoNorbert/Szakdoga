@@ -89,4 +89,20 @@ public class Structure extends GameObject {
             return 0;
         }
     }
+
+    public int getStorageCapacity() {
+        return storageCapacity;
+    }
+
+    public boolean isHome() {
+        return isHome;
+    }
+
+    public byte getInteractCapacity() {
+        return interactCapacity;
+    }
+
+    public ArrayList<Character> getInInteractionWith() {
+        return inInteractionWith;
+    }
 }
