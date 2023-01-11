@@ -1,1 +1,0 @@
-25,18,Health,Thirst,Energy,Sleep,Clean
