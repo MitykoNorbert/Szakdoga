@@ -1,13 +1,11 @@
 package GameObjects;
 
 
-import GameObjects.GameObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Character extends GameObject {
-    int asd=0;
+    int asd=0; //to be removed
     private int rotation;
     private HashMap<String,NeedValue> needs;
     private HashMap<String,Structure> refillSources;
@@ -56,23 +54,34 @@ public class Character extends GameObject {
 
             if(currentTask==null){
                 if(asd==0){
-                    currentTask=new Moving(this,200,"Walking",10,27);
+                    currentTask=new MovingProcess(this,200,"Walking",10,27);
                     currentTask.progressTick();
                 }
-                if(needs.get("Energy").belowPercent(0.7F)){
-                    Tile sourceTile = findOptimalSourceFor("Energy");
-                    currentTask = new Moving(this,200,"Going to get Energy",sourceTile.getRow() ,sourceTile.getCol());
-                    currentTask.progressTick();
-                }
+                    if(needs.get(getLowestNeed()).belowPercent(0.4F)){
+                        System.out.println(getLowestNeed()+"is below 40%!!");
+                        Tile sourceTile = findOptimalSourceFor(getLowestNeed());
+                        currentTask = new MovingProcess(this,200,"Going to get "+getLowestNeed(),sourceTile.getRow() ,sourceTile.getCol());
+                        currentTask.progressTick();
+                    }
+
+
 
             }else{
                 currentTask.progressTick();
                 if(currentTask.isCompleted()){
+                    boolean justarrived = false;
+                    if(currentTask instanceof MovingProcess){
+                        justarrived = true;
+                    }
                     asd++;
                     currentTask=null;
                     System.out.println("MEGVAN KÉSZ");
+                    if (justarrived){
+                        InteractStructure();
+                    }
+
                 }
-                if(currentTask instanceof Moving){
+                if(currentTask instanceof MovingProcess){
 
                 }
             }
@@ -105,10 +114,37 @@ public class Character extends GameObject {
             interactingWithStructure=map.getTile(this.getRowPos(),this.getColPos()).getOccupiedBy();
             System.out.println("not interacting");
         }
+
+    }
+    private String InteractStructure(){
+        if (interactingWithStructure!=null){
+           return "Already interacting";
+        }
+        if(currentTask!=null){
+            return "Already have a task";
+        }
+        //for(String key : needs.keySet()){}
+        System.out.println(getRowPos()+", "+getColPos()+" is occupied by "+map.getTile(getRowPos(),getColPos()).getOccupiedBy());
+        if(map.getTile(getRowPos(),getColPos()).getOccupiedBy()==null){
+            return "There's no structure where i just arrived";
+        }
+        if (map.getTile(getRowPos(),getColPos()).getOccupiedBy().getProvides().containsKey(getLowestNeed())){
+                currentTask = new InteractingProcess(this, 15, "Regaining "+getLowestNeed(),map.getTile(getRowPos(),getColPos()).getOccupiedBy(),getLowestNeed());
+            System.out.println("Found source for "+getLowestNeed());
+        }
+
+
+
+        return "Successfully started interaction";
     }
     public void MoveTo(int row, int col){
-        setRowPos(row);
-        setColPos(col);
+        if(row >= 0 && row < map.getRowSize()){
+            setRowPos(row);
+        }
+        if(col >= 0 && col < map.getColSize()){
+            setColPos(col);
+        }
+
     }
     public void TurnRandom(){
         this.rotation=(int)(Math.random()*4);
@@ -146,6 +182,7 @@ public class Character extends GameObject {
     public HashMap<String, NeedValue> getNeeds() {
         return needs;
     }
+
     public boolean stepUp(){
         if(getRowPos()==0){
             return false;
@@ -186,6 +223,7 @@ public class Character extends GameObject {
         }
         return false;
     }
+
     public ArrayList<Structure> findSourcesFor(String need){
         ArrayList<Structure> sources = new ArrayList<Structure>();
         ArrayList<Structure> structures = map.getStructures();
@@ -195,16 +233,36 @@ public class Character extends GameObject {
         }
         return sources;
     }
+
     public Tile findOptimalSourceFor(ArrayList<Structure> structures,String need){
         int index =  (int) (Math.random() * (structures.size()-1));
         return map.getTile(structures.get(index).getRowPos(),structures.get(index).getColPos());
     }
+
     public Tile findOptimalSourceFor(String need){
         ArrayList<Structure> structures = findSourcesFor(need);
         int index =  (int) (Math.random() * (structures.size()));
         System.out.println("row:"+structures.get(index).getRowPos()+"col:"+structures.get(index).getColPos());
         return map.getTile(structures.get(index).getRowPos(),structures.get(index).getColPos());
     }
+
+    public String getLowestNeed(){
+        float min=1;
+        String minName = null;
+        for(String key : needs.keySet()){
+            if(needs.get(key).getPercentage()<min){
+                min=needs.get(key).getPercentage();
+                minName=key;
+            }
+        }
+        return minName;
+    }
+    public ArrayList<String> getPriorityList(){
+        //todo
+        ArrayList<String> priorityList = new ArrayList<String>();
+        return null;
+    }
+
 
 
 }

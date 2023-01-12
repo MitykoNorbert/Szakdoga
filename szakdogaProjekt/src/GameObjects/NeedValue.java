@@ -97,4 +97,7 @@ public class NeedValue {
         }
         return false;
     }
+    public float getPercentage(){
+        return (float)value/maxValue;
+    }
 }
