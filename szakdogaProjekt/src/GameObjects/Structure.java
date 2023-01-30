@@ -16,9 +16,17 @@ public class Structure extends GameObject {
     private boolean isHome;
     private byte interactCapacity;
     private ArrayList<Character> inInteractionWith;
+    private String name;
 
+    public String getName() {
+        return name;
+    }
 
-    public Structure(int rowPos, int colPos, int width, int height, int storageCapacity, boolean isHome, byte interactCapacity,GameMap map) {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Structure(int rowPos, int colPos, int width, int height, int storageCapacity, boolean isHome, byte interactCapacity, GameMap map) {
         super(rowPos, colPos);
         this.width = width;
         this.height = height;
@@ -29,14 +37,19 @@ public class Structure extends GameObject {
         provides = new HashMap<String, Integer>();
         storage = new HashMap<String, Integer>();
         this.map=map;
-        for (int i = rowPos; i < rowPos+height; i++) {
-            for (int j = colPos; j < colPos+width; j++) {
+
+    }
+    public void placed(){
+        for (int i = this.getRowPos(); i < this.getRowPos()+height; i++) {
+            for (int j = this.getColPos(); j < this.getColPos()+width; j++) {
                 System.out.println("Row: "+i+", Coloumn:"+j);
-                map.getTile(i,j).setOccupiedBy(this);
+                if(i<map.getRowSize() && j <map.getColSize()){
+                    map.getTile(i,j).setOccupiedBy(this);
+                }
+
             }
         }
     }
-
     public int getWidth() {
         return width;
     }

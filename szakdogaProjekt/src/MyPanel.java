@@ -27,7 +27,9 @@ public class MyPanel extends JPanel {
         }
         map.spawnObjects();
     }
-
+    public int getTilesize(){
+        return tilesize;
+    }
     public int getDisplaySize() {
         return size;
     }

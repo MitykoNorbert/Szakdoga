@@ -73,6 +73,7 @@ public class GameMap {
         testhouse.shallProvide("Energy", 3);
         //if provides amount, it should need an interaction for example: "Regaining energy" process,/ if its 0, it should mean there is something in its storage that provides said thing
         objects.add(testhouse);
+        testhouse.placed();
         importStructures();
 
     }
@@ -196,6 +197,7 @@ public class GameMap {
                     }
                 }
                 objects.add(inputStruc);
+                inputStruc.placed();
 
             }
             myReader.close();
@@ -205,7 +207,19 @@ public class GameMap {
         }
         System.out.println("chars imported");
     }
+    public void addStructure(int row, int col, int width, int height, int storageCapcaity, boolean isHome, byte interactCapacity){
+        Structure structure = new Structure(row,col,width,height,storageCapcaity,isHome,interactCapacity,this);
+        objects.add(structure);
+        structure.placed();
+    }
+    public void addStructure(Structure structure){
+        objects.add(structure);
+        structure.placed();
+    }
 
+    public HashMap<String, NeedValue> getAvailableNeeds() {
+        return availableNeeds;
+    }
 
     public int getRowSize() {
         return rowSize;

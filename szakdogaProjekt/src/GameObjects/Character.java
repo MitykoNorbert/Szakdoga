@@ -15,6 +15,16 @@ public class Character extends GameObject {
     private Character interactingWithCharacter;
     private Structure interactingWithStructure;
     private Process currentTask;
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Character(int posX, int posY, GameMap map) {
         super(posX, posY);
         this.rotation=0;
@@ -57,12 +67,15 @@ public class Character extends GameObject {
                     currentTask=new MovingProcess(this,200,"Walking",10,27);
                     currentTask.progressTick();
                 }
+                if(getLowestNeed()!=null){
                     if(needs.get(getLowestNeed()).belowPercent(0.4F)){
                         System.out.println(getLowestNeed()+"is below 40%!!");
                         Tile sourceTile = findOptimalSourceFor(getLowestNeed());
                         currentTask = new MovingProcess(this,200,"Going to get "+getLowestNeed(),sourceTile.getRow() ,sourceTile.getCol());
                         currentTask.progressTick();
                     }
+                }
+
 
 
 
