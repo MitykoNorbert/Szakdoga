@@ -10,3 +10,12 @@ Energy
 Social Pub,3,6,0,nonhome,-1
 Condition,Clean
 Energy
+Social Pub,3,6,0,nonhome,-1
+Condition,Clean
+Energy
+Social Pub,3,6,0,nonhome,-1
+Condition,Clean
+Energy
+Social Pub,3,6,0,nonhome,-1
+Condition,Clean
+Energy

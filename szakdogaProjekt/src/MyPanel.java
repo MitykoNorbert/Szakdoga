@@ -15,6 +15,7 @@ public class MyPanel extends JPanel {
 
     MyPanel(){
         this.setPreferredSize(new Dimension(size,size));
+
         max=y;
         if(x>y){
             max=x;
@@ -35,9 +36,10 @@ public class MyPanel extends JPanel {
     }
 
     public void paint(Graphics g){
+        
         g2D = (Graphics2D) g;
         //g2D.drawLine(0,0,500,500);
-
+        tilesize=size/max;
         renderGround();
         renderObjects();
         //System.out.println("a paint has happened");

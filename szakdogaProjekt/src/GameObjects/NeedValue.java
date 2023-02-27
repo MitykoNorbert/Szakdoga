@@ -53,6 +53,9 @@ public class NeedValue {
     }
     public void IncreaseBy(int n){
         value+=n;
+        if(value>maxValue){
+            value=maxValue;
+        }
     }
 
     public void setValue(int value) {

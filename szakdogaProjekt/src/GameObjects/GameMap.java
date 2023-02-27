@@ -229,4 +229,13 @@ public class GameMap {
         return colSize;
     }
 
+    public Character charAtPosition(int row, int col){
+        for (int i = 0; i < objects.size(); i++) {
+            if(objects.get(i) instanceof Character && objects.get(i).getRowPos()==row && objects.get(i).getColPos()==col){
+                return (Character) objects.get(i);
+            }
+        }
+        return null;
+    }
+
 }
