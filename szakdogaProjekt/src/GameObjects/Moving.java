@@ -11,8 +11,8 @@ public class Moving extends Process {
     GameMap map;
     private HashMap<Tile, Integer> beenThere;
 
-    public Moving(Character character, int timeRequired, String name, int row, int col) {
-        super(character, timeRequired, name);
+    public Moving(Character character, int timeRequired, String name, int row, int col, String reason) {
+        super(character, timeRequired, name, reason);
         this.row = row;
         this.col = col;
         this.map = getCharacter().map;

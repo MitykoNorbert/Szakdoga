@@ -60,43 +60,10 @@ public class Character extends GameObject {
     }
 
     public void NextMove(){
-
-
             if(currentTask==null){
-                if(asd==0){
-                    currentTask=new MovingProcess(this,200,"Walking",10,27);
-                    currentTask.progressTick();
-                }
-                if(getLowestNeed()!=null){
-                    if(needs.get(getLowestNeed()).belowPercent(0.4F)){
-                        System.out.println(getLowestNeed()+"is below 40%!!");
-                        Tile sourceTile = findOptimalSourceFor(getLowestNeed());
-                        currentTask = new MovingProcess(this,200,"Going to get "+getLowestNeed(),sourceTile.getRow() ,sourceTile.getCol());
-                        currentTask.progressTick();
-                    }
-                }
-
-
-
-
+                fetchNewTask();
             }else{
-                currentTask.progressTick();
-                if(currentTask.isCompleted()){
-                    boolean justarrived = false;
-                    if(currentTask instanceof MovingProcess){
-                        justarrived = true;
-                    }
-                    asd++;
-                    currentTask=null;
-                    System.out.println("MEGVAN KÉSZ");
-                    if (justarrived){
-                        InteractStructure();
-                    }
-
-                }
-                if(currentTask instanceof MovingProcess){
-
-                }
+                continueTask();
             }
 
         System.out.println("Current: "+currentTask);
@@ -113,13 +80,15 @@ public class Character extends GameObject {
     public void InteractionHandling(){
         if (interactingWithStructure!=null){
             if (map.getTile(this.getRowPos(),this.getColPos()).getOccupiedBy()!=null){
-                    for(String key : needs.keySet()){
-                        if(needs.get(key).getValue()+5>=needs.get(key).getMaxValue()){
-                            needs.get(key).setValue(needs.get(key).getMaxValue());
-                        }
-                        needs.get(key).IncreaseBy(5);
-                        System.out.println(key+" was increased");
+                if(currentTask instanceof InteractingProcess){
+                    InteractingProcess interaction = ((InteractingProcess) currentTask);
+                    String key = interaction.getReason();
+                    if(interactingWithStructure.getProvides().containsKey(key)){
+                        int amount = interactingWithStructure.getIncreaseAmountFor(key);
+                        needs.get(key).IncreaseBy(amount);
                     }
+                }
+
             }else{
                 interactingWithStructure=null;
             }
@@ -129,7 +98,7 @@ public class Character extends GameObject {
         }
 
     }
-    private String InteractStructure(){
+    private String InteractStructure(String reason){
         if (interactingWithStructure!=null){
            return "Already interacting";
         }
@@ -141,9 +110,10 @@ public class Character extends GameObject {
         if(map.getTile(getRowPos(),getColPos()).getOccupiedBy()==null){
             return "There's no structure where i just arrived";
         }
-        if (map.getTile(getRowPos(),getColPos()).getOccupiedBy().getProvides().containsKey(getLowestNeed())){
-                currentTask = new InteractingProcess(this, 15, "Regaining "+getLowestNeed(),map.getTile(getRowPos(),getColPos()).getOccupiedBy(),getLowestNeed());
-            System.out.println("Found source for "+getLowestNeed());
+
+        if (map.getTile(getRowPos(),getColPos()).getOccupiedBy().getProvides().containsKey(getLowestPercentageNeed())){
+                currentTask = new InteractingProcess(this, 15, "Regaining "+ getLowestPercentageNeed(),map.getTile(getRowPos(),getColPos()).getOccupiedBy(), getLowestPercentageNeed());
+            System.out.println("Found source for "+ getLowestPercentageNeed());
         }
 
 
@@ -252,14 +222,29 @@ public class Character extends GameObject {
         return map.getTile(structures.get(index).getRowPos(),structures.get(index).getColPos());
     }
 
-    public Tile findOptimalSourceFor(String need){
+    public Structure findOptimalSourceFor(String need){
         ArrayList<Structure> structures = findSourcesFor(need);
-        int index =  (int) (Math.random() * (structures.size()));
-        System.out.println("row:"+structures.get(index).getRowPos()+"col:"+structures.get(index).getColPos());
-        return map.getTile(structures.get(index).getRowPos(),structures.get(index).getColPos());
+        //Random decision
+        //int index =  (int) (Math.random() * (structures.size()));
+        //System.out.println("row:"+structures.get(index).getRowPos()+"col:"+structures.get(index).getColPos());
+        //return map.getTile(structures.get(index).getRowPos(),structures.get(index).getColPos());
+        Structure closestStructure=null;
+        int minimumDistance=100000;
+
+        for (int i = 0; i < structures.size(); i++) {
+            if(structures.get(i).getProvides().containsKey(need)){
+                int distance=DistanceFromMe(structures.get(0));
+                if(distance<minimumDistance){
+                    minimumDistance=distance;
+                    closestStructure=structures.get(i);
+                }
+            }
+
+        }
+        return closestStructure;
     }
 
-    public String getLowestNeed(){
+    public String getLowestPercentageNeed(){
         float min=1;
         String minName = null;
         for(String key : needs.keySet()){
@@ -276,6 +261,53 @@ public class Character extends GameObject {
         return null;
     }
 
+    public Process getCurrentTask() {
+        return currentTask;
+    }
+    public int DistanceFromMe(GameObject target){
+        int row = target.getRowPos();
+        int col = target.getColPos();
+        return Math.abs(getRowPos()-row) + Math.abs(getColPos()-col);
+    }
+    public void fetchNewTask(){
+        if(asd==0){
+            currentTask=new MovingProcess(this,200,"Walking",10,27,"none");
+            currentTask.progressTick();
+        }
+        if(getLowestPercentageNeed()!=null){
+            if(needs.get(getLowestPercentageNeed()).belowPercent(0.4F)){
+                System.out.println(getLowestPercentageNeed()+"is below 40%!!");
+                Structure closestStructure=findOptimalSourceFor(getLowestPercentageNeed());
+                Tile sourceTile = map.getTile(0,0);
+                if(closestStructure!=null){
+                    sourceTile = findOptimalSourceFor(getLowestPercentageNeed()).getEntrance();
+                }
+                String reason=getLowestPercentageNeed();
+                currentTask = new MovingProcess(this,200,"Going to get "+ reason,sourceTile.getRow() ,sourceTile.getCol(),reason);
+                currentTask.progressTick();
+            }
+        }
+    }
+    public void continueTask() {
+        currentTask.progressTick();
+        if(currentTask.isCompleted()){
+            boolean justarrived = false;
+            if(currentTask instanceof MovingProcess){
+                justarrived = true;
+            }
+            asd++;
+            String reason = currentTask.getReason();
+            currentTask=null;
+            interactingWithStructure=null;
+            System.out.println("MEGVAN KÉSZ");
+            if (justarrived){
+                System.out.println(InteractStructure(reason));
 
+            }
 
+        }
+        if(currentTask instanceof MovingProcess){
+
+        }
+    }
 }

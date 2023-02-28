@@ -8,18 +8,18 @@ public class MovingProcess extends Process {
     private final int col;
     private int cRow;
     private int cCol;
+    private String reason;
     GameMap map;
     private HashMap<Tile, Integer> beenThere;
 
-    public MovingProcess(Character character, int timeRequired, String name, int row, int col) {
-        super(character, timeRequired, name);
+    public MovingProcess(Character character, int timeRequired, String name, int row, int col, String forWhat) {
+        super(character, timeRequired, name,forWhat);
         this.row = row;
         this.col = col;
         this.map = getCharacter().map;
         this.beenThere = new HashMap<Tile, Integer>();
         cRow = getCharacter().getRowPos();
         cCol = getCharacter().getColPos();
-
     }
 
     @Override

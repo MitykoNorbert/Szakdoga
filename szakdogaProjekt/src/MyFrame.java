@@ -394,12 +394,19 @@ public class MyFrame extends JFrame implements ActionListener {
                 CustomProgressBar bar = new CustomProgressBar(300,20, Color.cyan);
                 bar.setString(need);
                 bar.setProgress((int)(selectedCharacter.getNeeds().get(need).getPercentage()*100));
+                bar.setPreferredSize(new Dimension((int) (panel4.getWidth()*0.6),15));
                 panel4.add(bar);
                 System.out.println("added "+need);
             }
+            JLabel messageLabel= new JLabel("Current task:");
+            messageLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+            messageLabel.setForeground(Color.BLACK);
+            messageLabel.setPreferredSize(new Dimension(panel4.getWidth(),200));
+            panel4.add(messageLabel);
         }
         panel4.revalidate();
         panel4.repaint();
+        UpdatePanel4();
 
         //CustomProgressBar health = new CustomProgressBar(300,20,Color.red);
         //health.setProgress(30);
@@ -411,11 +418,19 @@ public class MyFrame extends JFrame implements ActionListener {
                 if(comp instanceof CustomProgressBar){
                     CustomProgressBar bar = (CustomProgressBar) comp;
                     bar.setProgress((int)(selectedCharacter.getNeeds().get(bar.getText()).getPercentage()*100));
+                    bar.setPreferredSize(new Dimension((int) (panel4.getWidth()*0.6),15));
+                }else if(comp instanceof JLabel){
+                    comp.setPreferredSize(new Dimension(panel4.getWidth(),200));
+                    if(selectedCharacter.getCurrentTask()!=null){
+                        ((JLabel) comp).setText(selectedCharacter.getCurrentTask().getName());
+                    }else{
+                        ((JLabel) comp).setText("No task");
+                    }
 
                 }
             }
         }
 
-
+        panel4.revalidate();
     }
 }

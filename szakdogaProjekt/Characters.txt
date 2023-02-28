@@ -1,4 +1,1 @@
-25,18,Health,Thirst,Energy,Sleep,Clean
-5,8,Health,Thirst,Energy,Sleep,Clean
-5,18,Health,Thirst,Energy,Sleep,Clean
-2,18,Health,Thirst,Energy,Sleep,Clean
+25,18,Health,Thirst,Energy,Clean

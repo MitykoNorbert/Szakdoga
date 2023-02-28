@@ -5,12 +5,14 @@ public class Process {
     private boolean completed;
     private Character character;
     private String name;
+    private String reason;
 
-    public Process(Character character, int timeRequired, String name) {
+    public Process(Character character, int timeRequired, String name, String reason) {
         this.timeRequired = timeRequired;
         this.completed = false;
         this.character = character;
         this.name = name;
+        this.reason = reason;
     }
 
     public void progressTick(){
@@ -54,5 +56,13 @@ public class Process {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

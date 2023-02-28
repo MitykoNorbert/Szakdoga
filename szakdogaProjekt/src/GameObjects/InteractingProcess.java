@@ -2,19 +2,20 @@ package GameObjects;
 
 public class InteractingProcess extends Process {
     private final GameObject partner;
-    private final String forwhat;
 
-    public InteractingProcess(Character character,int timeRequired, String name, GameObject partner, String forwhat) {
-        super(character, timeRequired, name);
+
+    public InteractingProcess(Character character,int timeRequired, String name, GameObject partner, String forWhat) {
+        super(character, timeRequired, name, forWhat);
         this.partner = partner;
-        this.forwhat = forwhat;
     }
-    @Override
-    public void progressTick() {
 
-    }
     @Override
     protected void Action(){
 
     }
+
+    public GameObject getPartner() {
+        return partner;
+    }
+
 }

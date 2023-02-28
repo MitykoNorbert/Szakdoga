@@ -20,9 +20,11 @@ public class CustomProgressBar extends JPanel {
         progressLabel = new JLabel("0%");
         progressLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         label = new JLabel();
-        add(label, BorderLayout.WEST);
+        label.setHorizontalAlignment(SwingConstants.LEFT);
+
 
         add(progressBar, BorderLayout.CENTER);
+        add(label, BorderLayout.WEST);
         add(progressLabel, BorderLayout.EAST);
     }
 

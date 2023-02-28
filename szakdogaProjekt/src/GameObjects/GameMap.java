@@ -68,12 +68,12 @@ public class GameMap {
 
     public void spawnObjects() {
         importCharacters();
-        Structure testhouse = new Structure(15, 16, 7, 5, 0, false, (byte) -1, this);
-        testhouse.shallProvide("Health",4);
-        testhouse.shallProvide("Energy", 3);
+        //Structure testhouse = new Structure(15, 16, 7, 5, 0, false, (byte) -1, this);
+        //testhouse.shallProvide("Health",4);
+        //testhouse.shallProvide("Energy", 3);
         //if provides amount, it should need an interaction for example: "Regaining energy" process,/ if its 0, it should mean there is something in its storage that provides said thing
-        objects.add(testhouse);
-        testhouse.placed();
+        //objects.add(testhouse);
+        //testhouse.placed();
         importStructures();
 
     }

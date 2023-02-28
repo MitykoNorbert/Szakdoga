@@ -118,4 +118,13 @@ public class Structure extends GameObject {
     public ArrayList<Character> getInInteractionWith() {
         return inInteractionWith;
     }
+    public Tile getEntrance(){
+        //int horizontalTile=(int) (Math.random()*width)+getColPos();
+        //int verticalTile=(int) (Math.random()*height)+getRowPos();
+        //return map.getTile(horizontalTile,verticalTile);
+        return map.getTile(getRowPos(),getColPos());
+    }
+    public int getIncreaseAmountFor(String needName){
+        return 5;
+    }
 }
