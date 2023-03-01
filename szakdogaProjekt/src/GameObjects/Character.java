@@ -210,10 +210,15 @@ public class Character extends GameObject {
     public ArrayList<Structure> findSourcesFor(String need){
         ArrayList<Structure> sources = new ArrayList<Structure>();
         ArrayList<Structure> structures = map.getStructures();
+        int all=0;
         for (int i = 0; i < structures.size(); i++) {
-            structures.get(i).getProvides().containsKey(need);
-            sources.add(structures.get(i));
+            if(structures.get(i).getProvides().containsKey(need)){
+                sources.add(structures.get(i));
+            }
+
+            all++;
         }
+        System.out.println("Amount of Sources for "+need+":"+sources.size()+", all:"+all);
         return sources;
     }
 
@@ -232,13 +237,11 @@ public class Character extends GameObject {
         int minimumDistance=100000;
 
         for (int i = 0; i < structures.size(); i++) {
-            if(structures.get(i).getProvides().containsKey(need)){
-                int distance=DistanceFromMe(structures.get(0));
+                int distance=DistanceFromMe(structures.get(i));
                 if(distance<minimumDistance){
                     minimumDistance=distance;
                     closestStructure=structures.get(i);
                 }
-            }
 
         }
         return closestStructure;

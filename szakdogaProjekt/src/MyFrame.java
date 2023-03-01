@@ -135,7 +135,6 @@ public class MyFrame extends JFrame implements ActionListener {
         panel2.add(buttonPanel1,BorderLayout.NORTH);
         panel2.add(buttonPanel2, BorderLayout.NORTH);
         panel2.add(buttonPanel3, BorderLayout.NORTH);
-
         panel2.setPreferredSize(new Dimension((int)(this.getWidth() * 0.7), (int)(this.getHeight() * 0.3)));
         LoadPanel4();
         buttonPanel1.add(timeSpeedButton);
@@ -213,10 +212,7 @@ public class MyFrame extends JFrame implements ActionListener {
 
         LoadAvailableBuildings();
         for (int i = 0; i < availableStructures.size(); i++) {
-            JButton addStructure=new JButton(availableStructures.get(i).getName());
-            int offsetHorizontal = i%4;
-            int offsetVertical =i/4;
-            addStructure.setBounds(10+offsetHorizontal*140,540+offsetVertical*50,120,30);
+            TileButton addStructure=new TileButton(availableStructures.get(i).getHeight(),availableStructures.get(i).getWidth(),availableStructures.get(i).getName());
             buttons.put(i,addStructure);
             int buttonNumber=i;
             addStructure.addActionListener(new ActionListener() {
