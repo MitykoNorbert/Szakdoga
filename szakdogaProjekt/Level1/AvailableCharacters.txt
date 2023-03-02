@@ -1,0 +1,2 @@
+Teszt elek,Health,Thirst,Energy,Sleep,Clean
+Minden Áron,Health,Thirst,Music

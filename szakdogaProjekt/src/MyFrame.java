@@ -286,7 +286,7 @@ public class MyFrame extends JFrame implements ActionListener {
         //TODO
         System.out.println("Structures importing..");
         try {
-            File needslistFile = new File("AvailableStructures.txt");
+            File needslistFile = new File("LoadedLevel/AvailableStructures.txt");
             Scanner myReader = new Scanner(needslistFile);
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();
@@ -333,7 +333,7 @@ public class MyFrame extends JFrame implements ActionListener {
     }
     public void LoadAvailableCharacters(){
         try {
-            File needslistFile = new File("Characters.txt");
+            File needslistFile = new File("LoadedLevel/Characters.txt");
             Scanner myReader = new Scanner(needslistFile);
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();

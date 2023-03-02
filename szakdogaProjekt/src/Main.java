@@ -10,7 +10,8 @@ public class Main {
 
 
         System.out.println("hello");
-        MyFrame frame = new MyFrame();
+        LevelSelector selector = new LevelSelector();
+        selector.setVisible(true);
 
 
 

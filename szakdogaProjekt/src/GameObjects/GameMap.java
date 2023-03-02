@@ -54,8 +54,8 @@ public class GameMap {
         this.objects = new ArrayList<GameObject>();
         this.tileMap = new Tile[height][width];
         this.availableNeeds = new HashMap<String, NeedValue>();
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
+        for (int i = 0; i < rowSize; i++) {
+            for (int j = 0; j < colSize; j++) {
                 this.tileMap[i][j] = new Tile(i, j);
                 //egyesével kell inicializálni mert máskülönben null
                 if (i * j % 100 >= 20 && i * j % 100 < 25) {
@@ -108,7 +108,7 @@ public class GameMap {
         System.out.println("Chars importing..");
 
         try {
-            File needslistFile = new File("Needs.txt");
+            File needslistFile = new File("LoadedLevel/Needs.txt");
             Scanner myReader = new Scanner(needslistFile);
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();
@@ -136,7 +136,7 @@ public class GameMap {
             e.printStackTrace();
         }
         try {
-            File needslistFile = new File("Characters.txt");
+            File needslistFile = new File("LoadedLevel/Characters.txt");
             Scanner myReader = new Scanner(needslistFile);
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();
@@ -164,7 +164,7 @@ public class GameMap {
         //TODO
         System.out.println("Structures importing..");
         try {
-            File needslistFile = new File("Structures.txt");
+            File needslistFile = new File("LoadedLevel/Structures.txt");
             Scanner myReader = new Scanner(needslistFile);
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();

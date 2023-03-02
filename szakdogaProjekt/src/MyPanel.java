@@ -5,8 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MyPanel extends JPanel {
-    private int x=30;
-    private int y=30;
+    private int rowsize =40;
+    private int colsize =30;
     private int max;
     private int tilesize;
     private int size=500;
@@ -16,16 +16,12 @@ public class MyPanel extends JPanel {
     MyPanel(){
         this.setPreferredSize(new Dimension(size,size));
 
-        max=y;
-        if(x>y){
-            max=x;
+        max= colsize;
+        if(rowsize > colsize){
+            max= rowsize;
         }
         tilesize=size/max;
-        map=new GameMap(x,y);
-        int max=y;
-        if (x>max){
-            max=x;
-        }
+        map=new GameMap(rowsize, colsize);
         map.spawnObjects();
     }
     public int getTilesize(){
@@ -51,8 +47,8 @@ public class MyPanel extends JPanel {
 
     public void renderGround(){
 
-        for (int i = 0; i < y; i++) {
-            for (int j = 0; j < x; j++) {
+        for (int i = 0; i < rowsize; i++) {
+            for (int j = 0; j < colsize; j++) {
 
                 if(!map.getTile(i,j).isWalkable()){
                     g2D.setPaint(Color.blue);

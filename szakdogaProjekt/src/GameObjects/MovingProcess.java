@@ -28,13 +28,13 @@ public class MovingProcess extends Process {
         incrementBeenThere();
         cRow = getCharacter().getRowPos();
         cCol = getCharacter().getColPos();
-        Action();
+
         if (row == getCharacter().getRowPos() && col == getCharacter().getColPos() || getTimeRequired()<=0) {
             setTimeRequired(0);
             setCompleted(true);
             //System.out.println("completed: "+isCompleted());
         } else {
-
+            Action();
         }
 
     }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Character extends GameObject {
-    int asd=0; //to be removed
     private int rotation;
     private HashMap<String,NeedValue> needs;
     private HashMap<String,Structure> refillSources;
@@ -273,13 +272,7 @@ public class Character extends GameObject {
         return Math.abs(getRowPos()-row) + Math.abs(getColPos()-col);
     }
     public void fetchNewTask(){
-        if(asd==0){
-            currentTask=new MovingProcess(this,200,"Walking",10,27,"none");
-            currentTask.progressTick();
-        }
         if(getLowestPercentageNeed()!=null){
-            if(needs.get(getLowestPercentageNeed()).belowPercent(0.4F)){
-                System.out.println(getLowestPercentageNeed()+"is below 40%!!");
                 Structure closestStructure=findOptimalSourceFor(getLowestPercentageNeed());
                 Tile sourceTile = map.getTile(0,0);
                 if(closestStructure!=null){
@@ -288,7 +281,7 @@ public class Character extends GameObject {
                 String reason=getLowestPercentageNeed();
                 currentTask = new MovingProcess(this,200,"Going to get "+ reason,sourceTile.getRow() ,sourceTile.getCol(),reason);
                 currentTask.progressTick();
-            }
+
         }
     }
     public void continueTask() {
@@ -298,7 +291,6 @@ public class Character extends GameObject {
             if(currentTask instanceof MovingProcess){
                 justarrived = true;
             }
-            asd++;
             String reason = currentTask.getReason();
             currentTask=null;
             interactingWithStructure=null;

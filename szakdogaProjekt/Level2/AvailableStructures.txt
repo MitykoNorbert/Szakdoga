@@ -1,0 +1,9 @@
+Small Garden,3,2,0,nonhome,-1
+Condition
+Food,Thirst
+Social Pub,3,6,0,nonhome,-1
+Condition,Clean
+Energy
+Gym,4,2,0,nonhome,-1
+Condition,Clean
+Clean
