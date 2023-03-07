@@ -15,16 +15,14 @@ public class LevelSelector extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
 
-        // Create the main panel
+
         panel = new JPanel(new BorderLayout());
         add(panel);
 
-        // Create the file chooser and add it to the panel
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         panel.add(fileChooser, BorderLayout.CENTER);
 
-        // Create the start button and add it to the panel
         startButton = new JButton("Start");
         startButton.setEnabled(false);
         startButton.addActionListener(new ActionListener() {
@@ -34,11 +32,11 @@ public class LevelSelector extends JFrame {
         });
         panel.add(startButton, BorderLayout.SOUTH);
 
-        // Create the status label and add it to the panel
+
         statusLabel = new JLabel("Please select a level folder.");
         panel.add(statusLabel, BorderLayout.NORTH);
 
-        // Add a listener to the file chooser to enable the start button when a folder is selected
+
         fileChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 selectedFolder = fileChooser.getSelectedFile();

@@ -5,11 +5,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MyPanel extends JPanel {
-    private int rowsize =40;
+    private int rowsize =30;
     private int colsize =30;
     private int max;
     private int tilesize;
-    private int size=500;
+    private int size=600;
     private GameMap map;
     Graphics2D g2D;
 

@@ -29,7 +29,7 @@ public class MyFrame extends JFrame implements ActionListener {
     private ArrayList<Character> availableCharacters;
     private HashMap<Integer, JButton> buttons;
     private boolean paused;
-    private JPanel panel2,panel3,panel4;
+    private JPanel panel2,panel3,panel4,tileMapContainer;
     public MyFrame(){
         // the timer variable must be a javax.swing.Timer
         // TIMER_DELAY is a constant int and = 35;
@@ -40,6 +40,7 @@ public class MyFrame extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 gameLoop();
                 UpdatePanel4();
+                UpdatePanel3();
             }
         });
         paused = true;
@@ -47,70 +48,62 @@ public class MyFrame extends JFrame implements ActionListener {
         availableStructures = new ArrayList<Structure>();
         availableCharacters = new ArrayList<Character>();
         buttons = new HashMap<Integer, JButton>();
+
+
+
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel tilemapContainer = new JPanel(new FlowLayout()); // use a FlowLayout for the tilemap
+// Create the containers for the North and South sides
+        JPanel northContainer = new JPanel(new BorderLayout());
+        JPanel southContainer = new JPanel(new BorderLayout());
+
+// Create panel2, panel3, and panel4
         panel2 = new JPanel();
         panel3 = new JPanel();
         panel4 = new JPanel();
+        tileMapContainer=new JPanel();
+        tileMapContainer.add(tileMapPanel);
+        panel4.setBackground(Color.yellow);
+        panel3.setBackground(Color.green);
+        panel2.setBackground(Color.blue);
 
-        // Set background colors for each panel for visualization
-        tilemapContainer.setBackground(Color.RED);
-        panel2.setBackground(Color.BLUE);
-        panel3.setBackground(Color.GREEN);
-        panel4.setBackground(Color.YELLOW);
+// Create the progress bars in panel3
+        panel3.setLayout(new BoxLayout(panel3, BoxLayout.Y_AXIS));
 
-        // Create a JPanel for the tilemap
+// Add the components to the North container
+        northContainer.add(tileMapContainer, BorderLayout.CENTER);
+        northContainer.add(panel3, BorderLayout.EAST);
 
-        tileMapPanel.setBackground(Color.WHITE);
+// Add the components to the South container
+        southContainer.add(panel2, BorderLayout.CENTER);
+        southContainer.add(panel4, BorderLayout.EAST);
 
-        // Add the tilemapPanel to the tilemapContainer
-        tilemapContainer.add(tileMapPanel);
+// Add the containers to the frame
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(northContainer, BorderLayout.NORTH);
+        getContentPane().add(southContainer, BorderLayout.SOUTH);
 
-        // Set the layout manager for the frame to GridBagLayout
-        this.setLayout(new GridBagLayout());
+        JSplitPane tileMapSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tileMapPanel, panel3);
+        tileMapSplitPane.setResizeWeight(0.8);
 
-        // Set constraints for each panel
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridheight = 2;
-        c.gridwidth = 2;
-        c.weightx = 0.7;
-        c.weighty = 0.7;
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.NORTHWEST; // add this line to anchor the panel to the top-left corner
-        this.add(tilemapContainer, c);
+// Create the split pane between panel2 and panel4
+        JSplitPane panel2SplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel2, panel4);
+        panel2SplitPane.setResizeWeight(0.7);
 
-        c.gridx = 0;
-        c.gridy = 2;
-        c.gridheight = 1;
-        c.gridwidth = 2;
-        c.weightx = 0.7;
-        c.weighty = 0.3;
-        c.fill = GridBagConstraints.BOTH;
-        this.add(panel2, c);
+// Create the split pane between north and south sections
+        JSplitPane northSouthSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tileMapSplitPane, panel2SplitPane);
+        northSouthSplitPane.setResizeWeight(0.8);
 
-        c.gridx = 2;
-        c.gridy = 0;
-        c.gridheight = 2;
-        c.gridwidth = 1;
-        c.weightx = 0.3;
-        c.weighty = 0.7;
-        c.fill = GridBagConstraints.BOTH;
-        this.add(panel3, c);
+// Add the components to the frame
+        getContentPane().add(northSouthSplitPane, BorderLayout.CENTER);
 
-        c.gridx = 2;
-        c.gridy = 2;
-        c.gridheight = 1;
-        c.gridwidth = 1;
-        c.weightx = 0.3;
-        c.weighty = 0.3;
-        c.fill = GridBagConstraints.BOTH;
-        this.add(panel4, c);
+
+
+
+
 
         JButton timeSpeedButton=new JButton("Time - ");
-        timeSpeedButton.setBounds(10,480,95,30);
         timeSpeedButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
@@ -132,15 +125,12 @@ public class MyFrame extends JFrame implements ActionListener {
         JPanel buttonPanel2 = new JPanel();
         JPanel buttonPanel3 = new JPanel();
         panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
-        panel2.add(buttonPanel1,BorderLayout.NORTH);
-        panel2.add(buttonPanel2, BorderLayout.NORTH);
-        panel2.add(buttonPanel3, BorderLayout.NORTH);
-        panel2.setPreferredSize(new Dimension((int)(this.getWidth() * 0.7), (int)(this.getHeight() * 0.3)));
-        LoadPanel4();
+        panel2.add(buttonPanel1);
+        panel2.add(buttonPanel2);
+        panel2.add(buttonPanel3);
         buttonPanel1.add(timeSpeedButton);
 
         JButton timeSlowButton=new JButton("Time + ");
-        timeSlowButton.setBounds(150,480,95,30);
         timeSlowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
@@ -155,11 +145,7 @@ public class MyFrame extends JFrame implements ActionListener {
             }
         });
         buttonPanel1.add(timeSlowButton);
-
-
-
         JButton timePauseButton=new JButton("Pause/Play ");
-        timePauseButton.setBounds(300,480,120,30);
         timePauseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
@@ -211,6 +197,8 @@ public class MyFrame extends JFrame implements ActionListener {
         });
 
         LoadAvailableBuildings();
+        LoadPanel3();
+        LoadPanel4();
         for (int i = 0; i < availableStructures.size(); i++) {
             TileButton addStructure=new TileButton(availableStructures.get(i).getHeight(),availableStructures.get(i).getWidth(),availableStructures.get(i).getName());
             buttons.put(i,addStructure);
@@ -235,7 +223,7 @@ public class MyFrame extends JFrame implements ActionListener {
         this.pack();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dim.width/2-this.getPreferredSize().width/2, dim.height/2-this.getPreferredSize().height/2);
-        //setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
 
     }
@@ -387,7 +375,7 @@ public class MyFrame extends JFrame implements ActionListener {
         }else{
             System.out.println(selectedCharacter);
             for (String need: selectedCharacter.getNeeds().keySet()) {
-                CustomProgressBar bar = new CustomProgressBar(300,20, Color.cyan);
+                CustomProgressBar bar = new CustomProgressBar((int)(panel4.getWidth()*0.6),20, Color.cyan);
                 bar.setString(need);
                 bar.setProgress((int)(selectedCharacter.getNeeds().get(need).getPercentage()*100));
                 bar.setPreferredSize(new Dimension((int) (panel4.getWidth()*0.6),15));
@@ -414,7 +402,7 @@ public class MyFrame extends JFrame implements ActionListener {
                 if(comp instanceof CustomProgressBar){
                     CustomProgressBar bar = (CustomProgressBar) comp;
                     bar.setProgress((int)(selectedCharacter.getNeeds().get(bar.getText()).getPercentage()*100));
-                    bar.setPreferredSize(new Dimension((int) (panel4.getWidth()*0.6),15));
+                    bar.setPreferredSize(new Dimension((int) (panel4.getWidth()*0.7),15));
                 }else if(comp instanceof JLabel){
                     comp.setPreferredSize(new Dimension(panel4.getWidth(),200));
                     if(selectedCharacter.getCurrentTask()!=null){
@@ -422,11 +410,44 @@ public class MyFrame extends JFrame implements ActionListener {
                     }else{
                         ((JLabel) comp).setText("No task");
                     }
-
                 }
             }
         }
 
         panel4.revalidate();
+    }
+    public void LoadPanel3(){
+        panel3.removeAll();
+            for (String need: tileMapPanel.getMap().getAvailableNeeds().keySet()) {
+                CustomProgressBar bar = new CustomProgressBar(200,10, Color.yellow);
+                bar.setString(need);
+                bar.setPreferredSize(new Dimension(100,15));
+                panel3.add(bar);
+                System.out.println(bar+" added");
+            }
+        JLabel messageLabel= new JLabel("TEXT");
+        messageLabel.setFont(new Font("Sans Serif", Font.PLAIN, 18));
+        messageLabel.setForeground(Color.black);
+        messageLabel.setPreferredSize(new Dimension(200,100));
+        panel3.add(messageLabel);
+
+        panel3.revalidate();
+        panel3.repaint();
+        UpdatePanel3();
+    }
+    public void UpdatePanel3(){
+            for (Component comp:panel3.getComponents()) {
+                if(comp instanceof CustomProgressBar){
+                    CustomProgressBar bar = (CustomProgressBar) comp;
+                    bar.setProgress(tileMapPanel.getMap().GetAverageLevelOf(bar.getText()));
+                    bar.setPreferredSize(new Dimension(100,10));
+                } else if (comp instanceof JLabel) {
+                    ((JLabel) comp).setText("Number of deaths: "+tileMapPanel.getMap().getDeaths());
+                    //comp.setPreferredSize(new Dimension(panel4.getWidth(),100));
+                }
+            }
+        System.out.println(panel3.getComponents());
+        panel3.revalidate();
+        panel3.repaint();
     }
 }

@@ -1,9 +1,15 @@
+Large Garden,7,5,0,nonhome,-1
+Condition
+Food,Thirst
 Small Garden,3,2,0,nonhome,-1
 Condition
 Food,Thirst
 Social Pub,3,6,0,nonhome,-1
 Condition,Clean
 Energy
-Gym,4,2,0,nonhome,-1
+Social Pub,3,6,0,nonhome,-1
+Condition,Clean
+Energy
+Gym,6,6,0,nonhome,-1
 Condition,Clean
 Clean

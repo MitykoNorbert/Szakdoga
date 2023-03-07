@@ -14,6 +14,7 @@ public class GameMap {
     private ArrayList<GameObject> objects;
     private int rowSize;
     private int colSize;
+    private int deaths;
     private HashMap<String, NeedValue> availableNeeds;
 
     public Tile[][] getTileMap() {
@@ -33,7 +34,7 @@ public class GameMap {
     }
 
     public Tile getTile(int row, int col) {
-        if(row>rowSize || col > colSize || row<0 || col<0){
+        if (row > rowSize || col > colSize || row < 0 || col < 0) {
             return null;
         }
         return tileMap[row][col];
@@ -41,10 +42,10 @@ public class GameMap {
 
     public boolean IsWalkable(int row, int col) {
         //array out of bounds, walkable visszaadása
-        if (row < 0 || col < 0 || row >= rowSize || col >= colSize){
+        if (row < 0 || col < 0 || row >= rowSize || col >= colSize) {
             return false;
-        }else{
-            return getTile(row,col).isWalkable();
+        } else {
+            return getTile(row, col).isWalkable();
         }
     }
 
@@ -54,6 +55,7 @@ public class GameMap {
         this.objects = new ArrayList<GameObject>();
         this.tileMap = new Tile[height][width];
         this.availableNeeds = new HashMap<String, NeedValue>();
+        this.deaths=0;
         for (int i = 0; i < rowSize; i++) {
             for (int j = 0; j < colSize; j++) {
                 this.tileMap[i][j] = new Tile(i, j);
@@ -77,10 +79,11 @@ public class GameMap {
         importStructures();
 
     }
-    public ArrayList<Structure> getStructures(){
+
+    public ArrayList<Structure> getStructures() {
         ArrayList<Structure> structures = new ArrayList<Structure>();
         for (int i = 0; i < objects.size(); i++) {
-            if(objects.get(i) instanceof Structure){
+            if (objects.get(i) instanceof Structure) {
                 structures.add((Structure) objects.get(i));
             }
         }
@@ -92,7 +95,11 @@ public class GameMap {
             objects.get(i).Update();
             if (objects.get(i).getNeeds().containsKey("Health")) {
                 if (objects.get(i).getNeeds().get("Health").getValue() == 0) {
+                    if(objects.get(i) instanceof Character){
+                        deaths++;
+                    }
                     objects.remove(i);
+
                 }
             }
 
@@ -160,6 +167,7 @@ public class GameMap {
         }
         System.out.println("chars imported");
     }
+
     public void importStructures() {
         //TODO
         System.out.println("Structures importing..");
@@ -175,13 +183,13 @@ public class GameMap {
                 int height = Integer.parseInt(strucStats[3]);
                 int storageCapacity = Integer.parseInt(strucStats[4]);
                 boolean isHome = false;
-                if(strucStats[5].equals("home") || strucStats[5].equals("true")){
+                if (strucStats[5].equals("home") || strucStats[5].equals("true")) {
                     isHome = true;
                 }
                 byte interactCapacity = Byte.parseByte(strucStats[6]);
                 line = myReader.nextLine();
                 strucStats = line.split(",");
-                Structure inputStruc = new Structure(row, col, width, height, storageCapacity, isHome, interactCapacity,this);
+                Structure inputStruc = new Structure(row, col, width, height, storageCapacity, isHome, interactCapacity, this);
                 for (int i = 0; i < strucStats.length; i++) {
                     if (availableNeeds.containsKey(strucStats[i])) {
                         NeedValue personalNeed = new NeedValue(availableNeeds.get(strucStats[i]));
@@ -193,7 +201,7 @@ public class GameMap {
                 for (int i = 0; i < strucStats.length; i++) {
                     if (availableNeeds.containsKey(strucStats[i])) {
                         String provision = strucStats[i];
-                        inputStruc.getProvides().put(provision,1);
+                        inputStruc.getProvides().put(provision, 1);
                     }
                 }
                 objects.add(inputStruc);
@@ -207,12 +215,14 @@ public class GameMap {
         }
         System.out.println("chars imported");
     }
-    public void addStructure(int row, int col, int width, int height, int storageCapcaity, boolean isHome, byte interactCapacity){
-        Structure structure = new Structure(row,col,width,height,storageCapcaity,isHome,interactCapacity,this);
+
+    public void addStructure(int row, int col, int width, int height, int storageCapcaity, boolean isHome, byte interactCapacity) {
+        Structure structure = new Structure(row, col, width, height, storageCapcaity, isHome, interactCapacity, this);
         objects.add(structure);
         structure.placed();
     }
-    public void addStructure(Structure structure){
+
+    public void addStructure(Structure structure) {
         objects.add(structure);
         structure.placed();
     }
@@ -229,13 +239,42 @@ public class GameMap {
         return colSize;
     }
 
-    public Character charAtPosition(int row, int col){
+    public Character charAtPosition(int row, int col) {
         for (int i = 0; i < objects.size(); i++) {
-            if(objects.get(i) instanceof Character && objects.get(i).getRowPos()==row && objects.get(i).getColPos()==col){
+            if (objects.get(i) instanceof Character && objects.get(i).getRowPos() == row && objects.get(i).getColPos() == col) {
                 return (Character) objects.get(i);
             }
         }
         return null;
     }
 
+    public int GetAverageLevelOf(String need) {
+        int total = 0;
+        int examined = 0;
+        for (int i = 0; i < objects.size(); i++) {
+            if (objects.get(i).getNeeds().containsKey(need)) {
+                total += objects.get(i).getNeeds().get(need).getPercentage()*100;
+                examined++;
+            }
+        }
+        if(examined==0){
+            return 0;
+        }
+        return total / examined;
+
+    }
+
+    public HashMap<String,Integer> GetAverageStats() {
+        HashMap<String, Integer> averages = new HashMap<String, Integer>();
+        for (String key : availableNeeds.keySet()) {
+            averages.put(key,GetAverageLevelOf(key)*100);
+        }
+        return averages;
+    }
+
+    public int getDeaths() {
+        return deaths;
+    }
+
 }
+
