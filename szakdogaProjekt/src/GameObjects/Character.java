@@ -13,7 +13,7 @@ public class Character extends GameObject {
     GameMap map;
     private Character interactingWithCharacter;
     private Structure interactingWithStructure;
-    private Process currentTask;
+    private ArrayList<Process> currentTasks;
     private String name;
 
     public String getName() {
@@ -30,6 +30,7 @@ public class Character extends GameObject {
         this.map = map;
         this.needs= new HashMap<String,NeedValue>();
         needs.put("Health",new NeedValue(100,100,0,"unknown",0));
+        currentTasks=new ArrayList<Process>();
     }
 
     @Override
@@ -59,13 +60,15 @@ public class Character extends GameObject {
     }
 
     public void NextMove(){
-            if(currentTask==null){
+            if(currentTasks.isEmpty()){
                 fetchNewTask();
             }else{
                 continueTask();
             }
+        if(!currentTasks.isEmpty()){
+            System.out.println("Current: "+currentTasks.get(0));
+        }
 
-        System.out.println("Current: "+currentTask);
         /*
         StepForward();
         InteractionHandling();
@@ -79,8 +82,8 @@ public class Character extends GameObject {
     public void InteractionHandling(){
         if (interactingWithStructure!=null){
             if (map.getTile(this.getRowPos(),this.getColPos()).getOccupiedBy()!=null){
-                if(currentTask instanceof InteractingProcess){
-                    InteractingProcess interaction = ((InteractingProcess) currentTask);
+                if(currentTasks.get(0) instanceof InteractingProcess){
+                    InteractingProcess interaction = ((InteractingProcess) currentTasks.get(0));
                     String key = interaction.getReason();
                     if(interactingWithStructure.getProvides().containsKey(key)){
                         int amount = interactingWithStructure.getIncreaseAmountFor(key);
@@ -101,7 +104,7 @@ public class Character extends GameObject {
         if (interactingWithStructure!=null){
            return "Already interacting";
         }
-        if(currentTask!=null){
+        if(!currentTasks.isEmpty()){
             return "Already have a task";
         }
         //for(String key : needs.keySet()){}
@@ -111,8 +114,9 @@ public class Character extends GameObject {
         }
 
         if (map.getTile(getRowPos(),getColPos()).getOccupiedBy().getProvides().containsKey(getLowestPercentageNeed())){
-                currentTask = new InteractingProcess(this, 15, "Regaining "+ getLowestPercentageNeed(),map.getTile(getRowPos(),getColPos()).getOccupiedBy(), getLowestPercentageNeed());
-            System.out.println("Found source for "+ getLowestPercentageNeed());
+                InteractingProcess newTask = new InteractingProcess(this, 15, "Regaining "+ getLowestPercentageNeed(),map.getTile(getRowPos(),getColPos()).getOccupiedBy(), getLowestPercentageNeed());
+                currentTasks.add(0,newTask);
+                System.out.println("Found source for "+ getLowestPercentageNeed());
         }
 
 
@@ -264,7 +268,10 @@ public class Character extends GameObject {
     }
 
     public Process getCurrentTask() {
-        return currentTask;
+        if(currentTasks.isEmpty()){
+            return null;
+        }
+        return currentTasks.get(0);
     }
     public int DistanceFromMe(GameObject target){
         int row = target.getRowPos();
@@ -279,20 +286,21 @@ public class Character extends GameObject {
                     sourceTile = findOptimalSourceFor(getLowestPercentageNeed()).getEntrance();
                 }
                 String reason=getLowestPercentageNeed();
-                currentTask = new MovingProcess(this,200,"Going to get "+ reason,sourceTile.getRow() ,sourceTile.getCol(),reason);
-                currentTask.progressTick();
+                MovingProcess newTask = new MovingProcess(this,200,"Going to get "+ reason,sourceTile.getRow() ,sourceTile.getCol(),reason);
+                currentTasks.add(0, newTask);
+                currentTasks.get(0).progressTick();
 
         }
     }
     public void continueTask() {
-        currentTask.progressTick();
-        if(currentTask.isCompleted()){
+        currentTasks.get(0).progressTick();
+        if(currentTasks.get(0).isCompleted()){
             boolean justarrived = false;
-            if(currentTask instanceof MovingProcess){
+            if(currentTasks.get(0) instanceof MovingProcess){
                 justarrived = true;
             }
-            String reason = currentTask.getReason();
-            currentTask=null;
+            String reason = currentTasks.get(0).getReason();
+            currentTasks.remove(0);
             interactingWithStructure=null;
             System.out.println("MEGVAN KÉSZ");
             if (justarrived){
@@ -301,8 +309,9 @@ public class Character extends GameObject {
             }
 
         }
-        if(currentTask instanceof MovingProcess){
 
-        }
+    }
+    public void useItem(Item item){
+
     }
 }
