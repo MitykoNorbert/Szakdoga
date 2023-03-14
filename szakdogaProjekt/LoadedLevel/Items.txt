@@ -1,0 +1,4 @@
+Apple,Food,50,150,consumable,9
+Water bottle,Thirst,300,500,consumable,40,
+Energy drink,Energy,70,120,consumable,30
+Headphones,Music,3,200,-

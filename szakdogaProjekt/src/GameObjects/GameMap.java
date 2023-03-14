@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class GameMap {
@@ -16,6 +17,7 @@ public class GameMap {
     private int colSize;
     private int deaths;
     private HashMap<String, NeedValue> availableNeeds;
+    private HashMap<String,Item> availableItems;
 
     public Tile[][] getTileMap() {
         return tileMap;
@@ -55,6 +57,7 @@ public class GameMap {
         this.objects = new ArrayList<GameObject>();
         this.tileMap = new Tile[height][width];
         this.availableNeeds = new HashMap<String, NeedValue>();
+        this.availableItems = new HashMap<String,Item>();
         this.deaths=0;
         for (int i = 0; i < rowSize; i++) {
             for (int j = 0; j < colSize; j++) {
@@ -77,6 +80,15 @@ public class GameMap {
         //objects.add(testhouse);
         //testhouse.placed();
         importStructures();
+        importItems();
+        Character almaman=null;
+        for (int i = 0; i < getCharacters().size(); i++) {
+            if(getCharacters().get(i).getNeeds().containsKey("Food")){
+                almaman=getCharacters().get(i);
+                break;
+            }
+        }
+        almaman.addToInventory(availableItems.get("Apple").Copy());
 
     }
 
@@ -89,6 +101,16 @@ public class GameMap {
         }
         return structures;
     }
+    public ArrayList<Character> getCharacters() {
+        ArrayList<Character> characters = new ArrayList<Character>();
+        for (int i = 0; i < objects.size(); i++) {
+            if (objects.get(i) instanceof Character) {
+                characters.add((Character) objects.get(i));
+            }
+        }
+        return characters;
+    }
+
 
     public void UpdateObjects() {
         for (int i = 0; i < objects.size(); i++) {
@@ -274,6 +296,35 @@ public class GameMap {
 
     public int getDeaths() {
         return deaths;
+    }
+    
+    public void importItems(){
+        try {
+            File itemlistFile = new File("LoadedLevel/Items.txt");
+            Scanner myReader = new Scanner(itemlistFile);
+            while (myReader.hasNextLine()) {
+                String line = myReader.nextLine();
+                String[] itemStats = line.split(",");
+                String name = itemStats[0];
+                String restores = itemStats[1];
+                int amount = Integer.parseInt(itemStats[2]);
+                int weight = Integer.parseInt(itemStats[3]);
+                boolean consumable =false;
+                if(itemStats[4].equalsIgnoreCase("consumable")){
+                    consumable=true;
+                }
+                int time=0;
+                if(itemStats.length>5){
+                    time = Integer.parseInt(itemStats[5]);
+                }
+                Item newItem = new Item(name,restores,weight,amount,consumable,time);
+                availableItems.put(name,newItem);
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred while reading the Items.txt");
+            e.printStackTrace();
+        }
     }
 
 }

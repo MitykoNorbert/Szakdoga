@@ -3,18 +3,22 @@ package GameObjects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class Character extends GameObject {
     private int rotation;
     private HashMap<String,NeedValue> needs;
     private HashMap<String,Structure> refillSources;
-    private HashMap<String,Integer> inventory;
+    private HashSet<Item> inventory;
     ArrayList<Structure> homes;
     GameMap map;
     private Character interactingWithCharacter;
     private Structure interactingWithStructure;
     private ArrayList<Process> currentTasks;
+    private ArrayList<Item> itemsInUse;
     private String name;
+    private final int carryMax=5000;
+    private int carryWeight;
 
     public String getName() {
         return name;
@@ -28,9 +32,12 @@ public class Character extends GameObject {
         super(posX, posY);
         this.rotation=0;
         this.map = map;
+        this.carryWeight=0;
         this.needs= new HashMap<String,NeedValue>();
         needs.put("Health",new NeedValue(100,100,0,"unknown",0));
         currentTasks=new ArrayList<Process>();
+        itemsInUse = new ArrayList<Item>();
+        inventory = new HashSet<>();
     }
 
     @Override
@@ -60,6 +67,7 @@ public class Character extends GameObject {
     }
 
     public void NextMove(){
+        ItemChecks();
             if(currentTasks.isEmpty()){
                 fetchNewTask();
             }else{
@@ -69,14 +77,23 @@ public class Character extends GameObject {
             System.out.println("Current: "+currentTasks.get(0));
         }
 
-        /*
-        StepForward();
         InteractionHandling();
-        if(Math.random()>0.9){
-            TurnRandom();
+
+    }
+    public void ItemChecks(){
+        String needed = getLowestPercentageNeed();
+        Item chosenItem = null;
+        for (Item item:inventory) {
+            if(item.getRestores().equals(needed)){
+                if(needs.get(needed).getMaxValue()>=needs.get(needed).getValue()+item.getRestoreValue()){
+                    chosenItem=item;
+                    break;
+                }
+            }
         }
-        */
-        InteractionHandling();
+        if(chosenItem!=null){
+            useItem(chosenItem);
+        }
 
     }
     public void InteractionHandling(){
@@ -96,7 +113,7 @@ public class Character extends GameObject {
             }
         }else{
             interactingWithStructure=map.getTile(this.getRowPos(),this.getColPos()).getOccupiedBy();
-            System.out.println("not interacting");
+            //System.out.println("not interacting with the structure");
         }
 
     }
@@ -312,6 +329,23 @@ public class Character extends GameObject {
 
     }
     public void useItem(Item item){
+        if (item.isConsumable()){
+            currentTasks.add(new ConsumptionProcess(this,item.getConsumeTime(),"Consuming "+item.getName(),item.getRestores(),item));
+            inventory.remove(item);
+            System.out.println("I ate the "+item.getName());
+        }else{
+            if(!itemsInUse.contains(item)){
+                itemsInUse.add(item);
+            }
 
+        }
+    }
+    public boolean addToInventory(Item item){
+        if(carryMax>=carryWeight+item.getWeight()){
+            inventory.add(item);
+            carryWeight+=item.getWeight();
+            return true;
+        }
+        return false;
     }
 }
