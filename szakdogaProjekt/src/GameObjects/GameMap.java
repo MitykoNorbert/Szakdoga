@@ -1,14 +1,11 @@
 package GameObjects;
 
-import GameObjects.Character;
-import GameObjects.GameObject;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Scanner;
+
 
 public class GameMap {
     private Tile[][] tileMap;
@@ -18,6 +15,13 @@ public class GameMap {
     private int deaths;
     private HashMap<String, NeedValue> availableNeeds;
     private HashMap<String,Item> availableItems;
+    private HashMap<String, Integer> completeRequirements;
+    private int completitionTimer;
+    private String gameState;
+
+    public HashMap<String, Item> getAvailableItems() {
+        return availableItems;
+    }
 
     public Tile[][] getTileMap() {
         return tileMap;
@@ -58,7 +62,10 @@ public class GameMap {
         this.tileMap = new Tile[height][width];
         this.availableNeeds = new HashMap<String, NeedValue>();
         this.availableItems = new HashMap<String,Item>();
+        this.completeRequirements = new HashMap<String,Integer>();
+        this.completitionTimer=0;
         this.deaths=0;
+        this.gameState="In progress";
         for (int i = 0; i < rowSize; i++) {
             for (int j = 0; j < colSize; j++) {
                 this.tileMap[i][j] = new Tile(i, j);
@@ -68,7 +75,65 @@ public class GameMap {
                 }
             }
         }
+        tileMap=importGameMap();
+        loadRequirements();
 
+    }
+    public void loadRequirements(){
+        try {
+            File file = new File("LoadedLevel/CompleteRequirements.txt");
+            Scanner myReader = new Scanner(file);
+            while (myReader.hasNextLine()) {
+                String line = myReader.nextLine();
+                String[] itemStats = line.split(":");
+                String name = itemStats[0];
+                int amount = Integer.parseInt(itemStats[1]);
+                this.completeRequirements.put(name,amount);
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred while reading the CompleteRequirements.txt");
+            e.printStackTrace();
+        }
+    }
+    public boolean requirementCheck(){
+        boolean timerCompleted=true;
+        for (String key:completeRequirements.keySet()) {
+            if(key.equals("MaximumDeaths")){
+                if(completeRequirements.get(key)<deaths){
+                    levelFailed();
+                    return false;
+                }
+            }else if(key.equals("MaintainTime")){
+                //System.out.println("found timer");
+                //System.out.println(completeRequirements.get(key)+" req vs timer:"+completitionTimer);
+                if(completeRequirements.get(key)>completitionTimer){
+                    //System.out.println(completeRequirements.get(key)+" is less than timer:"+completitionTimer);
+                    timerCompleted=false;
+                }
+            }else if(getAverageLevelOf(key)<completeRequirements.get(key)){
+                completitionTimer=0;
+                //System.out.println("avg "+key+" is smaller than "+completeRequirements.get(key));
+                return false;
+            }
+
+        }
+        completitionTimer++;
+        //System.out.println("COmpletition timer: "+completitionTimer);
+        //System.out.println("Timer completed: "+timerCompleted);
+
+        return timerCompleted;
+    }
+    public void levelFailed(){
+        gameState="Failed";
+    }
+
+    public String getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(String gameState) {
+        this.gameState = gameState;
     }
 
     public void spawnObjects() {
@@ -128,13 +193,44 @@ public class GameMap {
         }
     }
 
-    public void importGameMap() {
-        //TODO
+    public Tile[][]  importGameMap() {
+        Tile[][] map = null;
+        File f = new File("LoadedLevel/GameMap.txt");
+        Scanner myReader = null;
+        try {
+            myReader = new Scanner(f);
+            String line = myReader.nextLine();
+            String[] size = line.split(",");
+            int mapWidth = Integer.parseInt(size[0]);
+            int mapHeight = Integer.parseInt(size[1]);
+            map = new Tile[mapHeight][mapWidth];
+            // Read each subsequent line
+            for (int i = 0; i < mapHeight; i++) {
+                line = myReader.nextLine();
+                String[] values = line.split(",");
+                for (int j = 0; j < mapWidth; j++) {
+                    //map[i][j] = Integer.parseInt(values[j]);
+                    map[i][j] = new Tile(i,j,values[j],true);
+                    if(Integer.parseInt(values[j])>5){
+                        map[i][j].setWalkable(false);
+                    }
+
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+
+
+        //System.out.println("map imported");
+        return map;
     }
 
     public void importCharacters() {
-        //TODO
-        System.out.println("Chars importing..");
+        //System.out.println("Chars importing..");
 
         try {
             File needslistFile = new File("LoadedLevel/Needs.txt");
@@ -157,7 +253,7 @@ public class GameMap {
                 //System.out.println("Decrease rate: "+stats[5]);
                 //System.out.println(line);
                 availableNeeds.put(name, new NeedValue(value, maxValue, punishValue, punishStat, decRate));
-                System.out.println("NEW NEEED: " + name + ": " + availableNeeds.get(name).getValue());
+                //System.out.println("NEW NEEED: " + name + ": " + availableNeeds.get(name).getValue());
             }
             myReader.close();
         } catch (FileNotFoundException e) {
@@ -187,17 +283,21 @@ public class GameMap {
             System.out.println("An error occurred while reading Characters.txt.");
             e.printStackTrace();
         }
-        System.out.println("chars imported");
+       //System.out.println("chars imported");
     }
 
     public void importStructures() {
-        //TODO
-        System.out.println("Structures importing..");
+
+        //System.out.println("Structures importing..");
         try {
             File needslistFile = new File("LoadedLevel/Structures.txt");
             Scanner myReader = new Scanner(needslistFile);
             while (myReader.hasNextLine()) {
+
                 String line = myReader.nextLine();
+                if(line.equals("-")){
+                    line = myReader.nextLine();
+                }
                 String[] strucStats = line.split(",");
                 int row = Integer.parseInt(strucStats[0]);
                 int col = Integer.parseInt(strucStats[1]);
@@ -211,7 +311,7 @@ public class GameMap {
                 byte interactCapacity = Byte.parseByte(strucStats[6]);
                 line = myReader.nextLine();
                 strucStats = line.split(",");
-                Structure inputStruc = new Structure(row, col, width, height, storageCapacity, isHome, interactCapacity, this);
+                Structure inputStruc = new Structure(row, col, width, height, storageCapacity, isHome, interactCapacity, this, availableItems);
                 for (int i = 0; i < strucStats.length; i++) {
                     if (availableNeeds.containsKey(strucStats[i])) {
                         NeedValue personalNeed = new NeedValue(availableNeeds.get(strucStats[i]));
@@ -226,6 +326,15 @@ public class GameMap {
                         inputStruc.getProvides().put(provision, 1);
                     }
                 }
+                line= myReader.nextLine();
+                if(!line.equals("-")){
+                    strucStats = line.split(",") ;
+                    for (int i = 0; i < strucStats.length; i+=2) {
+                        String item = strucStats[i];
+                        int value =Integer.parseInt(strucStats[i+1]);
+                        inputStruc.getProvides().put(item,value);
+                    }
+                }
                 objects.add(inputStruc);
                 inputStruc.placed();
 
@@ -235,11 +344,11 @@ public class GameMap {
             System.out.println("An error occurred while reading Structures.txt.");
             e.printStackTrace();
         }
-        System.out.println("chars imported");
+        //System.out.println("chars imported");
     }
 
     public void addStructure(int row, int col, int width, int height, int storageCapcaity, boolean isHome, byte interactCapacity) {
-        Structure structure = new Structure(row, col, width, height, storageCapcaity, isHome, interactCapacity, this);
+        Structure structure = new Structure(row, col, width, height, storageCapcaity, isHome, interactCapacity, this, availableItems);
         objects.add(structure);
         structure.placed();
     }
@@ -270,7 +379,7 @@ public class GameMap {
         return null;
     }
 
-    public int GetAverageLevelOf(String need) {
+    public int getAverageLevelOf(String need) {
         int total = 0;
         int examined = 0;
         for (int i = 0; i < objects.size(); i++) {
@@ -289,7 +398,7 @@ public class GameMap {
     public HashMap<String,Integer> GetAverageStats() {
         HashMap<String, Integer> averages = new HashMap<String, Integer>();
         for (String key : availableNeeds.keySet()) {
-            averages.put(key,GetAverageLevelOf(key)*100);
+            averages.put(key, getAverageLevelOf(key)*100);
         }
         return averages;
     }

@@ -32,7 +32,7 @@ public class Moving extends Process {
         if (row == getCharacter().getRowPos() && col == getCharacter().getColPos()) {
             setTimeRequired(0);
             setCompleted(true);
-            System.out.println("completed: "+isCompleted());
+           //System.out.println("completed: "+isCompleted());
         } else {
 
         }
@@ -93,7 +93,7 @@ public class Moving extends Process {
             } else if (Math.abs(getNeighbors().get(i).getCol() - col) > Math.abs(cCol - col)) {
                 stepValues.put(getNeighbors().get(i), stepValues.get(getNeighbors().get(i)) + 1);
             }
-            System.out.println(getNeighbors().get(i).getRow() + ", " + getNeighbors().get(i).getCol() + "=" + stepValues.get(getNeighbors().get(i)));
+           //System.out.println(getNeighbors().get(i).getRow() + ", " + getNeighbors().get(i).getCol() + "=" + stepValues.get(getNeighbors().get(i)));
         }
         Tile best = getNeighbors().get(0);
         for (int i = 0; i < getNeighbors().size(); i++) {

@@ -1,0 +1,28 @@
+Large Garden,7,5,0,nonhome,-1
+Condition
+Food,Thirst
+Apple,6
+-
+Small Garden,3,2,0,nonhome,-1
+Condition
+Food,Thirst
+Apple,2
+-
+Social Pub,3,6,0,nonhome,-1
+Condition,Clean
+Energy
+Coffee,3
+-
+Social Pub,3,6,0,nonhome,-1
+Condition,Clean
+Energy
+Coffee,3
+-
+Gym,6,6,0,nonhome,-1
+Condition,Clean
+Clean
+-
+Hospital,6,8,0,nonhome,-1
+Condition,Clean
+Health
+-

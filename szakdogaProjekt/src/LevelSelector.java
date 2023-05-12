@@ -2,11 +2,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LevelSelector extends JFrame {
+    private List<String> levelNames;
+    private JList<String> levelList;
     private JButton startButton;
-    private JFileChooser fileChooser;
-    private File selectedFolder;
     private JLabel statusLabel;
     private JPanel panel;
 
@@ -14,55 +19,67 @@ public class LevelSelector extends JFrame {
         setTitle("Level Selector");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
-
+        setLocationRelativeTo(null);
 
         panel = new JPanel(new BorderLayout());
         add(panel);
 
-        fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        panel.add(fileChooser, BorderLayout.CENTER);
+        // Load the list of level names
+        levelNames = loadLevelNames();
 
+        // Create the level list GUI
+        levelList = new JList<>(levelNames.toArray(new String[levelNames.size()]));
+        levelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane levelListScrollPane = new JScrollPane(levelList);
+        panel.add(levelListScrollPane, BorderLayout.CENTER);
+
+        // Create the start button
         startButton = new JButton("Start");
-        startButton.setEnabled(false);
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                copyLevel();
+                String selectedLevelName = levelList.getSelectedValue();
+                if (selectedLevelName == null) {
+                    StartGame();
+                } else {
+                    copyLevel(selectedLevelName);
+                }
             }
         });
         panel.add(startButton, BorderLayout.SOUTH);
 
-
-        statusLabel = new JLabel("Please select a level folder.");
+        // Create the status label
+        statusLabel = new JLabel("Please select a level.");
         panel.add(statusLabel, BorderLayout.NORTH);
-
-
-        fileChooser.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                selectedFolder = fileChooser.getSelectedFile();
-                if (selectedFolder != null && selectedFolder.isDirectory()) {
-                    startButton.setEnabled(true);
-                    statusLabel.setText("Selected folder: " + selectedFolder.getAbsolutePath());
-                } else {
-                    startButton.setEnabled(false);
-                    statusLabel.setText("Please select a level folder.");
-                }
-            }
-        });
     }
 
-    private void copyLevel() {
+    private List<String> loadLevelNames() {
+        List<String> names = new ArrayList<>();
+        try {
+            Path levelsDir = Paths.get("Levels");
+            if (Files.isDirectory(levelsDir)) {
+                Files.list(levelsDir)
+                        .filter(Files::isDirectory)
+                        .forEach(levelDir -> names.add(levelDir.getFileName().toString()));
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return names;
+    }
+
+    private void copyLevel(String levelName) {
         // Copy the files from the selected level folder to the game folder
-        File gameFolder = new File("LoadedLevel");
-        if (!gameFolder.exists()) {
-            gameFolder.mkdir();
+        Path levelDir = Paths.get("Levels", levelName);
+        Path gameDir = Paths.get("LoadedLevel");
+        if (!gameDir.toFile().exists()) {
+            gameDir.toFile().mkdir();
         }
 
-        File[] filesToCopy = selectedFolder.listFiles((dir, name) -> name.endsWith(".txt"));
+        File[] filesToCopy = levelDir.toFile().listFiles((dir, name) -> name.endsWith(".txt"));
         for (File file : filesToCopy) {
             try {
                 FileInputStream inputStream = new FileInputStream(file);
-                FileOutputStream outputStream = new FileOutputStream(new File(gameFolder, file.getName()));
+                FileOutputStream outputStream = new FileOutputStream(new File(gameDir.toFile(), file.getName()));
 
                 byte[] buffer = new byte[1024];
                 int bytesRead;
@@ -88,5 +105,8 @@ public class LevelSelector extends JFrame {
         MyFrame frame = new MyFrame();
     }
 
-
+    public static void main(String[] args) {
+        LevelSelector levelSelector = new LevelSelector();
+        levelSelector.setVisible(true);
+    }
 }

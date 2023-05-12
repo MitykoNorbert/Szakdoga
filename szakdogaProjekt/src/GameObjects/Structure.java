@@ -1,7 +1,5 @@
 package GameObjects;
 
-import GameObjects.GameObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,13 +8,16 @@ public class Structure extends GameObject {
     private int height;
     private GameMap map;
     private int storageCapacity;
+    private int currentStorage;
     private HashMap<String, NeedValue> needs;
     private HashMap<String, Integer> provides;
     private HashMap<String, Integer> storage;
+    private HashMap<String, Item> itemstats;
     private boolean isHome;
     private byte interactCapacity;
     private ArrayList<Character> inInteractionWith;
     private String name;
+    private int ageTick;
 
     public String getName() {
         return name;
@@ -26,7 +27,7 @@ public class Structure extends GameObject {
         this.name = name;
     }
 
-    public Structure(int rowPos, int colPos, int width, int height, int storageCapacity, boolean isHome, byte interactCapacity, GameMap map) {
+    public Structure(int rowPos, int colPos, int width, int height, int storageCapacity, boolean isHome, byte interactCapacity, GameMap map, HashMap<String,Item> items) {
         super(rowPos, colPos);
         this.width = width;
         this.height = height;
@@ -37,12 +38,16 @@ public class Structure extends GameObject {
         provides = new HashMap<String, Integer>();
         storage = new HashMap<String, Integer>();
         this.map=map;
+        this.itemstats=items;
+        this.ageTick=0;
+        this.currentStorage=0;
+        addProvidedItems();
 
     }
     public void placed(){
         for (int i = this.getRowPos(); i < this.getRowPos()+height; i++) {
             for (int j = this.getColPos(); j < this.getColPos()+width; j++) {
-                System.out.println("Row: "+i+", Coloumn:"+j);
+                //System.out.println("Row: "+i+", Coloumn:"+j);
                 if(i<map.getRowSize() && j <map.getColSize()){
                     map.getTile(i,j).setOccupiedBy(this);
                 }
@@ -90,6 +95,16 @@ public class Structure extends GameObject {
 
     }
     public void addToStorage(String item, int amount){
+        if(currentStorage+amount*itemstats.get(item).getWeight() <=storageCapacity){
+            if(storage.containsKey(item)){
+            storage.put(item,storage.get(item)+amount);
+        }else{
+            storage.put(item,amount);
+
+        }
+            currentStorage += itemstats.get(item).getWeight()*amount;
+        }
+
 
     }
     public void takeFromStorage(String item, int amount){
@@ -126,5 +141,28 @@ public class Structure extends GameObject {
     }
     public int getIncreaseAmountFor(String needName){
         return 5;
+    }
+
+    public void GameTick(){
+        ageTick++;
+        for (String key:provides.keySet()) {
+            if(itemstats.containsKey(key)){
+                int value=provides.get(key);
+                if(ageTick*value/900>=900-value && ageTick*value/900<900+value){
+                    addToStorage(key,1);
+                }
+            }
+
+        }
+
+    }
+    private void addProvidedItems(){
+        for (String key:provides.keySet()) {
+            if(itemstats.containsKey(key)){
+                if(!provides.containsKey(itemstats.get(key).getRestores())){
+                    provides.put(itemstats.get(key).getRestores(),0);
+                }
+            }
+        }
     }
 }

@@ -1,0 +1,4 @@
+MaximumDeaths:1
+MaintainTime:150
+Food:60
+Thirst:50

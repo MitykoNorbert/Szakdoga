@@ -78,7 +78,6 @@ public class MovingProcess extends Process {
     }
 
     public Tile chooseStep() {
-        //chooses optimal step from available neighbors
         HashMap<Tile, Integer> stepValues = new HashMap<Tile, Integer>();
         for (int i = 0; i < getNeighbors().size(); i++) {
             if (Math.abs(getNeighbors().get(i).getRow() - row) < Math.abs(cRow - row)) {
@@ -93,7 +92,7 @@ public class MovingProcess extends Process {
             } else if (Math.abs(getNeighbors().get(i).getCol() - col) > Math.abs(cCol - col)) {
                 stepValues.put(getNeighbors().get(i), stepValues.get(getNeighbors().get(i)) + 1);
             }
-            System.out.println(getNeighbors().get(i).getRow() + ", " + getNeighbors().get(i).getCol() + "=" + stepValues.get(getNeighbors().get(i)));
+
         }
         Tile best = getNeighbors().get(0);
         for (int i = 0; i < getNeighbors().size(); i++) {
@@ -103,7 +102,8 @@ public class MovingProcess extends Process {
             if(!beenThere.containsKey(getNeighbors().get(i))){
                 beenThere.put(getNeighbors().get(i),0);
             }
-            if (stepValues.get(best) + beenThere.get(best) > stepValues.get(getNeighbors().get(i)) + beenThere.get(getNeighbors().get(i))){
+            if (stepValues.get(best) + beenThere.get(best) > stepValues.get(getNeighbors().get(i)) +
+                    beenThere.get(getNeighbors().get(i))){
                 best = getNeighbors().get(i);
             }
         }
